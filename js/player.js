@@ -120,7 +120,12 @@
     playlistCount.textContent = `${tracks.length} ${tracks.length === 1 ? "track" : "tracks"}`;
 
     if (!tracks.length) {
-      playlistList.innerHTML = `<button class="empty-state empty-load-btn" type="button">Load local audio files</button>`;
+      playlistList.innerHTML = `
+        <div class="empty-state empty-state-stack">
+          <button class="empty-load-btn" type="button">Load local audio files</button>
+          <button class="empty-drive-btn" type="button">Load from Google Drive</button>
+        </div>
+      `;
       return;
     }
 
@@ -399,22 +404,25 @@
     ctx.restore();
   }
 
-  fileInput.addEventListener("change", () => {
-    tracks.forEach(track => URL.revokeObjectURL(track.url));
-    tracks = Array.from(fileInput.files || [])
-      .filter(file => file.type.startsWith("audio/"))
-      .map(file => {
-        const meta = splitMetadata(file.name);
-        return {
-          file,
-          url: URL.createObjectURL(file),
-          title: meta.title,
-          artist: meta.artist,
-          duration: 0
-        };
-      });
+  function importAudioEntries(entries, autoplay = false) {
+    tracks.forEach(track => {
+      if (track.url && track.url.startsWith("blob:")) URL.revokeObjectURL(track.url);
+    });
 
-    tracks.forEach((track, index) => {
+    tracks = entries.map(entry => {
+      const meta = splitMetadata(entry.name || "Untitled Track");
+      return {
+        file: entry.file || null,
+        driveFileId: entry.driveFileId || null,
+        source: entry.source || "local",
+        url: entry.url || URL.createObjectURL(entry.blob || entry.file),
+        title: entry.title || meta.title,
+        artist: entry.artist || meta.artist,
+        duration: 0
+      };
+    });
+
+    tracks.forEach((track) => {
       const temp = new Audio(track.url);
       temp.addEventListener("loadedmetadata", () => {
         track.duration = temp.duration;
@@ -424,7 +432,33 @@
 
     currentIndex = -1;
     renderPlaylist();
-    if (tracks.length) loadTrack(0, false);
+    if (tracks.length) loadTrack(0, autoplay);
+  }
+
+  window.ParticlePlayer = {
+    loadBlobTracks(entries, autoplay = true) {
+      importAudioEntries(entries, autoplay);
+      togglePlaylist(false);
+    },
+    openLocalFilePicker() {
+      fileInput.click();
+    },
+    openPlaylist() {
+      togglePlaylist(true);
+    }
+  };
+
+  fileInput.addEventListener("change", () => {
+    const entries = Array.from(fileInput.files || [])
+      .filter(file => file.type.startsWith("audio/"))
+      .map(file => ({
+        file,
+        name: file.name,
+        source: "local"
+      }));
+
+    importAudioEntries(entries, false);
+    fileInput.value = "";
   });
 
   playBtn.addEventListener("click", playPause);
@@ -459,6 +493,16 @@
     const emptyLoad = event.target.closest(".empty-load-btn");
     if (emptyLoad) {
       fileInput.click();
+      return;
+    }
+
+    const emptyDrive = event.target.closest(".empty-drive-btn");
+    if (emptyDrive) {
+      if (window.GoogleDrivePlayer && typeof window.GoogleDrivePlayer.openPicker === "function") {
+        window.GoogleDrivePlayer.openPicker();
+      } else {
+        alert("Google Drive is not ready yet. Check js/config.js and refresh the page.");
+      }
       return;
     }
 

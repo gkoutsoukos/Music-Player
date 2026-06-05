@@ -6,6 +6,6 @@
 // - For a public GitHub Pages repo, restrict the API key in Google Cloud Console.
 // - Add your GitHub Pages URL to the allowed JavaScript origins.
 
-const GOOGLE_CLIENT_ID = "866119647282-cbjodpa3m31rq7skum6ut6js2lmdainm.apps.googleusercontent.com";
-const GOOGLE_API_KEY = "AIzaSyArCAC_PEey1ndO_7jnBTgghdrxgyVfPbo";
+const GOOGLE_CLIENT_ID = "xxxxxxxx.apps.googleusercontent.com";
+const GOOGLE_API_KEY = "xxxxxxxx";
 const GOOGLE_SCOPES = "https://www.googleapis.com/auth/drive.file";
