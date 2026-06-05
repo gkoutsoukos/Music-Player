@@ -108,34 +108,22 @@ body {
 }
 
 
-/* Transport dock: compact, custom, and visually tied to the particle identity */
+/* Transport dock: pure white icon-only controls */
 
 .transport-dock {
-  width: min(88vw, 540px);
+  width: min(88vw, 620px);
   display: grid;
-  gap: 14px;
+  gap: 12px;
   justify-items: center;
-  margin-top: 18px;
-  padding: 0;
+  margin-top: 14px;
 }
 
 .transport-main {
-  position: relative;
-  display: grid;
-  grid-template-columns: 48px 68px 48px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 18px;
-  height: 78px;
-  padding: 8px 18px;
-  border-radius: 999px;
-  background:
-    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.055), transparent 58%),
-    rgba(255,255,255,0.018);
-  border: 1px solid rgba(255,255,255,0.075);
-  box-shadow:
-    0 0 42px rgba(255,255,255,0.045),
-    inset 0 0 24px rgba(255,255,255,0.018);
+  gap: clamp(36px, 6vw, 70px);
+  height: 58px;
 }
 
 .control-btn {
@@ -147,103 +135,118 @@ body {
   border: 0;
   cursor: pointer;
   font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
   transition:
     transform 170ms ease,
     opacity 170ms ease,
-    filter 170ms ease,
-    box-shadow 170ms ease,
-    border-color 170ms ease;
-  -webkit-tap-highlight-color: transparent;
+    filter 170ms ease;
 }
 
-.side-btn {
-  width: 46px;
-  height: 46px;
-  opacity: 0.62;
+.icon-btn {
+  width: 48px;
+  height: 48px;
+  opacity: 0.84;
   border-radius: 50%;
 }
 
-.side-btn span {
-  width: 13px;
-  height: 13px;
-  border-left: 2px solid rgba(255,255,255,0.84);
-  border-bottom: 2px solid rgba(255,255,255,0.84);
-  transform: rotate(45deg) translateX(2px);
-}
-
-.next-side-btn span {
-  transform: rotate(225deg) translateX(2px);
-}
-
-.side-btn:hover {
+.icon-btn:hover {
   opacity: 1;
-  filter: drop-shadow(0 0 12px rgba(255,255,255,0.55));
+  filter:
+    drop-shadow(0 0 9px rgba(255,255,255,0.64))
+    drop-shadow(0 0 24px rgba(255,255,255,0.20));
 }
 
-.play-btn {
-  position: relative;
-  width: 66px;
-  height: 66px;
-  border-radius: 50%;
-  font-size: 0;
-  background:
-    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.105), rgba(255,255,255,0.022) 58%, transparent 72%);
-  border: 1px solid rgba(255,255,255,0.14);
-  box-shadow:
-    0 0 30px rgba(255,255,255,0.085),
-    inset 0 0 22px rgba(255,255,255,0.035);
+.icon-btn:active {
+  transform: scale(0.92);
 }
 
+/* Previous / next: line + triangle in pure white */
+.prev-btn::before,
+.next-btn::before {
+  content: "";
+  position: absolute;
+  width: 3px;
+  height: 20px;
+  background: rgba(255,255,255,0.92);
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(255,255,255,0.34);
+}
+
+.prev-btn::before {
+  left: 12px;
+}
+
+.next-btn::before {
+  right: 12px;
+}
+
+.prev-btn::after,
+.next-btn::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  filter: drop-shadow(0 0 8px rgba(255,255,255,0.38));
+}
+
+.prev-btn::after {
+  border-top: 11px solid transparent;
+  border-bottom: 11px solid transparent;
+  border-right: 18px solid rgba(255,255,255,0.92);
+  transform: translateX(4px);
+}
+
+.next-btn::after {
+  border-top: 11px solid transparent;
+  border-bottom: 11px solid transparent;
+  border-left: 18px solid rgba(255,255,255,0.92);
+  transform: translateX(-4px);
+}
+
+/* Play / pause: clean white transport icon, no enclosing circle */
 .play-btn::before {
   content: "";
   width: 0;
   height: 0;
-  border-top: 10px solid transparent;
-  border-bottom: 10px solid transparent;
-  border-left: 15px solid rgba(255,255,255,0.96);
+  border-top: 13px solid transparent;
+  border-bottom: 13px solid transparent;
+  border-left: 21px solid rgba(255,255,255,0.96);
   transform: translateX(2.5px);
-  filter: drop-shadow(0 0 8px rgba(255,255,255,0.48));
+  filter: drop-shadow(0 0 9px rgba(255,255,255,0.45));
 }
 
 .play-btn.is-playing::before,
 .play-btn.is-playing::after {
   content: "";
-  width: 5px;
-  height: 20px;
+  width: 6px;
+  height: 25px;
   border: 0;
   background: rgba(255,255,255,0.96);
   border-radius: 2px;
-  filter: drop-shadow(0 0 8px rgba(255,255,255,0.48));
+  filter: drop-shadow(0 0 9px rgba(255,255,255,0.45));
 }
 
 .play-btn.is-playing::before {
-  transform: translateX(-5px);
+  transform: translateX(-6px);
 }
 
 .play-btn.is-playing::after {
   position: absolute;
-  transform: translateX(5px);
-}
-
-.control-btn:hover {
-  transform: translateY(-1px);
-}
-
-.control-btn:active {
-  transform: scale(0.94);
+  transform: translateX(6px);
 }
 
 .progress-wrap {
-  width: min(86vw, 500px);
+  width: min(86vw, 570px);
   display: grid;
   grid-template-columns: 42px 1fr 42px;
   align-items: center;
   gap: 12px;
   padding: 0 2px;
+  margin-top: 2px;
 }
 
 .time-label {
-  color: rgba(255,255,255,0.42);
+  color: rgba(255,255,255,0.48);
   font-size: 11px;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.035em;
@@ -264,39 +267,39 @@ body {
 }
 
 .progress::-webkit-slider-runnable-track {
-  height: 2px;
+  height: 1px;
   border-radius: 999px;
   background:
     linear-gradient(90deg,
-      rgba(255,255,255,0.94) 0%,
-      rgba(255,255,255,0.94) var(--progress-fill),
-      rgba(255,255,255,0.13) var(--progress-fill),
-      rgba(255,255,255,0.13) 100%);
-  box-shadow: 0 0 12px rgba(255,255,255,0.09);
+      rgba(255,255,255,0.88) 0%,
+      rgba(255,255,255,0.88) var(--progress-fill),
+      rgba(255,255,255,0.16) var(--progress-fill),
+      rgba(255,255,255,0.16) 100%);
+  box-shadow: 0 0 10px rgba(255,255,255,0.10);
 }
 
 .progress::-moz-range-track {
-  height: 2px;
+  height: 1px;
   border-radius: 999px;
   background:
     linear-gradient(90deg,
-      rgba(255,255,255,0.94) 0%,
-      rgba(255,255,255,0.94) var(--progress-fill),
-      rgba(255,255,255,0.13) var(--progress-fill),
-      rgba(255,255,255,0.13) 100%);
-  box-shadow: 0 0 12px rgba(255,255,255,0.09);
+      rgba(255,255,255,0.88) 0%,
+      rgba(255,255,255,0.88) var(--progress-fill),
+      rgba(255,255,255,0.16) var(--progress-fill),
+      rgba(255,255,255,0.16) 100%);
+  box-shadow: 0 0 10px rgba(255,255,255,0.10);
 }
 
 .progress::-webkit-slider-thumb {
   appearance: none;
   width: 10px;
   height: 10px;
-  margin-top: -4px;
+  margin-top: -4.5px;
   border-radius: 50%;
   background: white;
   box-shadow:
     0 0 14px rgba(255,255,255,0.92),
-    0 0 34px rgba(255,255,255,0.30);
+    0 0 34px rgba(255,255,255,0.32);
 }
 
 .progress::-moz-range-thumb {
@@ -307,55 +310,19 @@ body {
   background: white;
   box-shadow:
     0 0 14px rgba(255,255,255,0.92),
-    0 0 34px rgba(255,255,255,0.30);
+    0 0 34px rgba(255,255,255,0.32);
 }
 
-.dock-actions {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
+.hidden-file-loader {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
 }
 
-.dock-action-btn,
-.load-label {
-  display: inline-grid;
-  place-items: center;
-  min-width: 82px;
-  height: 30px;
-  padding: 0 14px;
-  border: 1px solid rgba(255,255,255,0.105);
-  border-radius: 999px;
-  background: rgba(255,255,255,0.018);
-  color: rgba(255,255,255,0.56);
-  font-family: inherit;
-  font-size: 10px;
-  font-weight: 520;
-  letter-spacing: 0.17em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition:
-    color 160ms ease,
-    border-color 160ms ease,
-    background 160ms ease,
-    box-shadow 160ms ease,
-    transform 160ms ease;
-}
-
-.dock-action-btn:hover,
-.load-label:hover {
-  color: rgba(255,255,255,0.92);
-  border-color: rgba(255,255,255,0.22);
-  background: rgba(255,255,255,0.035);
-  box-shadow: 0 0 24px rgba(255,255,255,0.055);
-}
-
-.dock-action-btn:active,
-.load-label:active {
-  transform: scale(0.97);
-}
-
-.load-label input {
+.hidden-file-loader input {
   display: none;
 }
 
@@ -539,18 +506,17 @@ body {
 
   .transport-dock {
     width: 94vw;
-    gap: 12px;
+    gap: 10px;
   }
 
   .transport-main {
-    grid-template-columns: 44px 64px 44px;
-    gap: 12px;
-    height: 72px;
+    gap: 34px;
+    height: 54px;
   }
 
-  .play-btn {
-    width: 62px;
-    height: 62px;
+  .icon-btn {
+    width: 44px;
+    height: 44px;
   }
 
   .progress-wrap {
