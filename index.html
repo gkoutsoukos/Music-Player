@@ -19,23 +19,34 @@
       <div id="trackMeta" class="track-meta">LOCAL FILES — PARTICLE PLAYER</div>
     </section>
 
-    <section class="controls" aria-label="Playback controls">
-      <button id="prevBtn" class="control-btn" aria-label="Previous track">‹</button>
-      <button id="playBtn" class="control-btn play-btn" aria-label="Play or pause">▶</button>
-      <button id="nextBtn" class="control-btn" aria-label="Next track">›</button>
-    </section>
+    <section class="transport-dock" aria-label="Playback controls">
+      <div class="transport-main">
+        <button id="prevBtn" class="control-btn side-btn" aria-label="Previous track">
+          <span aria-hidden="true"></span>
+        </button>
 
-    <section class="progress-wrap">
-      <span id="currentTime" class="time-label">0:00</span>
-      <input id="progress" class="progress" type="range" min="0" max="1000" value="0" aria-label="Track progress" />
-      <span id="duration" class="time-label">0:00</span>
-    </section>
+        <button id="playBtn" class="control-btn play-btn" aria-label="Play or pause">
+          <span class="sr-only">Play or pause</span>
+        </button>
 
-    <section class="file-loader">
-      <label class="load-label">
-        Load tracks
-        <input id="fileInput" type="file" accept="audio/*" multiple />
-      </label>
+        <button id="nextBtn" class="control-btn side-btn next-side-btn" aria-label="Next track">
+          <span aria-hidden="true"></span>
+        </button>
+      </div>
+
+      <div class="progress-wrap">
+        <span id="currentTime" class="time-label">0:00</span>
+        <input id="progress" class="progress" type="range" min="0" max="1000" value="0" aria-label="Track progress" />
+        <span id="duration" class="time-label">0:00</span>
+      </div>
+
+      <div class="dock-actions">
+        <button id="playlistBtn" class="dock-action-btn" type="button">Playlist</button>
+        <label class="dock-action-btn load-label">
+          Load
+          <input id="fileInput" type="file" accept="audio/*" multiple />
+        </label>
+      </div>
     </section>
 
     <aside id="playlistPanel" class="playlist-panel" aria-hidden="true">

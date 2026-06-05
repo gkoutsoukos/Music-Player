@@ -1,73 +1,63 @@
-# DriveAmp
+# Particle Egg Music Player v3 — Control Overhaul
 
-A personal, browser-based music player inspired by Winamp and modern streaming apps.
+A GitHub-ready music player concept with:
 
-## Current version
-
-This is the modular base version converted from the working V0.2.1 prototype.
-
-## Repository structure
-
-```text
-driveamp/
-├── index.html
-├── css/
-│   └── styles.css
-├── js/
-│   └── app.js
-├── assets/
-│   └── README.md
-└── README.md
-```
-
-## Current features
-
-- Local file playback
-- Local folder playback
-- One-button Play/Pause
-- Search
-- Shuffle
-- Repeat
-- Track duration detection
-- Embedded metadata reading
-- Embedded album art display
-- iTunes-style sorting: artist → album → track number
-- Web Audio API engine
-- Purist / Hi-Fi / Winamp EQ modes
-- 5-band EQ panel
-- Preamp and volume control
-- Demo mode
+- black void / white particle visual identity
+- organic egg-shaped particle visualizer with freer cloud-like movement
+- denser particle clusters reacting to frequency bands
+- song title and metadata under the orb
+- minimal white controls with a CSS-drawn centered play/pause button
+- local audio file loading
+- playlist view opened by clicking/tapping the orb
+- active track highlighting
 
 ## How to use
 
-Open `index.html` in a browser.
+Upload these files to your GitHub Pages repo:
 
-For GitHub Pages:
-
-1. Upload all files and folders to your repository.
-2. Enable GitHub Pages.
-3. Set the source to the main branch/root folder.
-4. Open the GitHub Pages URL.
-
-## Important notes
-
-Metadata and artwork reading currently use `jsmediatags` from CDN:
-
-```html
-https://cdn.jsdelivr.net/npm/jsmediatags@3.9.7/dist/jsmediatags.min.js
+```text
+index.html
+css/player.css
+js/player.js
+assets/
+README.md
 ```
 
-If the app is opened without internet, playback still works, but metadata/artwork may fall back to folder and filename.
+Then open your GitHub Pages URL.
 
-For local files, the browser cannot permanently remember file paths after refresh. This is normal browser security behavior.
+## How the interaction works
 
-## Next planned steps
+- Click **Load tracks** and select local audio files.
+- Press **Play**.
+- Click/tap the particle egg to open the playlist.
+- Select a track from the playlist.
+- Click × or press Escape to return to the main visualizer.
 
-1. Visual redesign: modern streaming layout + Winamp character.
-2. Split `js/app.js` into modules:
-   - `audio-engine.js`
-   - `metadata.js`
-   - `local-library.js`
-   - `ui.js`
-   - `google-drive.js`
-3. Add Google Drive OAuth and folder scanning.
+## Notes
+
+This version uses the browser Web Audio API, so the visualizer reacts to audio only after playback starts.
+
+Local files are not uploaded anywhere. They stay in the browser session.
+
+## Suggested next refinements
+
+1. Add album art extraction if files include embedded artwork.
+2. Add drag-and-drop file loading.
+3. Add saved playlist state using IndexedDB.
+4. Add mobile swipe-down to close playlist.
+5. Add a more advanced particle transition where the orb visually unfolds into the playlist rows.
+
+
+## v2 changes
+
+- Centered the play triangle by replacing the text glyph with a CSS-drawn icon.
+- Added a proper CSS pause state.
+- Made particle movement more free-form with wander, swirl, loose spring-back, and stronger frequency-driven motion.
+
+## v3 changes
+
+- Replaced the old loose control row with a compact transport dock.
+- Redesigned previous / play / next controls as custom CSS shapes.
+- Moved Playlist and Load into smaller secondary buttons below the transport.
+- Reworked the progress bar styling so it feels less like a default web input.
+- Overall lower UI is now more compact, centered, and closer to the particle-player identity.
