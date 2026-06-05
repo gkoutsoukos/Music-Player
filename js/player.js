@@ -16,6 +16,7 @@
   const playlistCount = document.getElementById("playlistCount");
   const orbToggle = document.getElementById("orbToggle");
   const closePlaylist = document.getElementById("closePlaylist");
+  const playlistBtn = document.getElementById("playlistBtn");
 
   let tracks = [];
   let currentIndex = -1;
@@ -420,6 +421,10 @@
 
   closePlaylist.addEventListener("click", () => {
     togglePlaylist(false);
+  });
+
+  playlistBtn.addEventListener("click", () => {
+    togglePlaylist(true);
   });
 
   window.addEventListener("keydown", event => {
