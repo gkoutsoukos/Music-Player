@@ -1,0 +1,416 @@
+/* Particle Egg Music Player — v1
+   Drop-in direction: black void, organic frequency egg, minimal white UI.
+*/
+
+:root {
+  --bg: #000;
+  --fg: rgba(255,255,255,0.95);
+  --muted: rgba(255,255,255,0.55);
+  --faint: rgba(255,255,255,0.16);
+  --soft: rgba(255,255,255,0.08);
+  --glow: 0 0 24px rgba(255,255,255,0.30);
+  --font: Inter, "SF Pro Display", "Avenir Next", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+}
+
+body {
+  overflow: hidden;
+}
+
+.app-shell {
+  position: relative;
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: 1fr auto auto auto auto;
+  justify-items: center;
+  align-items: center;
+  padding: clamp(20px, 3vw, 44px);
+  background:
+    radial-gradient(circle at 50% 35%, rgba(255,255,255,0.035), transparent 34%),
+    radial-gradient(circle at 50% 100%, rgba(255,255,255,0.025), transparent 42%),
+    #000;
+}
+
+.visual-stage {
+  width: min(86vw, 980px);
+  height: min(52vh, 540px);
+  min-height: 310px;
+  display: grid;
+  place-items: center;
+  margin-top: 2vh;
+}
+
+.orb-button {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 32px;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.orb-button:focus-visible {
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.3), 0 0 40px rgba(255,255,255,0.18);
+}
+
+#visualizerCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  filter: drop-shadow(0 0 18px rgba(255,255,255,0.16));
+}
+
+.now-playing {
+  width: min(90vw, 780px);
+  text-align: center;
+  pointer-events: none;
+  transform: translateY(-8px);
+}
+
+.track-title {
+  font-size: clamp(22px, 3vw, 38px);
+  font-weight: 520;
+  letter-spacing: 0.055em;
+  line-height: 1.08;
+  text-transform: uppercase;
+  text-wrap: balance;
+  text-shadow: var(--glow);
+}
+
+.track-meta {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: clamp(11px, 1.35vw, 14px);
+  font-weight: 420;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.controls {
+  display: flex;
+  gap: clamp(18px, 4vw, 42px);
+  align-items: center;
+  justify-content: center;
+  margin-top: 22px;
+}
+
+.control-btn,
+.close-btn {
+  color: var(--fg);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 160ms ease, opacity 160ms ease, text-shadow 160ms ease;
+}
+
+.control-btn {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  font-size: 38px;
+  line-height: 1;
+  opacity: 0.82;
+}
+
+.play-btn {
+  font-size: 27px;
+  border: 1px solid var(--faint);
+  box-shadow: inset 0 0 18px rgba(255,255,255,0.025);
+}
+
+.control-btn:hover {
+  opacity: 1;
+  text-shadow: 0 0 20px rgba(255,255,255,0.72);
+}
+
+.control-btn:active {
+  transform: scale(0.92);
+  text-shadow: 0 0 30px rgba(255,255,255,0.92);
+}
+
+.progress-wrap {
+  width: min(88vw, 620px);
+  display: grid;
+  grid-template-columns: 42px 1fr 42px;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.time-label {
+  color: rgba(255,255,255,0.42);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.progress {
+  width: 100%;
+  appearance: none;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.88) var(--progress-fill, 0%), rgba(255,255,255,0.16) var(--progress-fill, 0%));
+  outline: none;
+  cursor: pointer;
+}
+
+.progress::-webkit-slider-thumb {
+  appearance: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 0 16px rgba(255,255,255,0.72);
+}
+
+.progress::-moz-range-thumb {
+  width: 9px;
+  height: 9px;
+  border: 0;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 0 16px rgba(255,255,255,0.72);
+}
+
+.file-loader {
+  margin-top: 18px;
+  margin-bottom: 4px;
+}
+
+.load-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 136px;
+  height: 36px;
+  border: 1px solid var(--faint);
+  border-radius: 999px;
+  color: rgba(255,255,255,0.68);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.load-label:hover {
+  color: white;
+  border-color: rgba(255,255,255,0.34);
+  box-shadow: 0 0 30px rgba(255,255,255,0.08);
+}
+
+.load-label input {
+  display: none;
+}
+
+/* Playlist: the orb unfolds into a track list */
+.playlist-panel {
+  position: fixed;
+  inset: clamp(18px, 4vw, 56px);
+  max-width: 860px;
+  margin: auto;
+  height: min(76vh, 690px);
+  padding: clamp(20px, 3vw, 38px);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 50% 22%, rgba(255,255,255,0.06), transparent 34%),
+    linear-gradient(180deg, rgba(10,10,10,0.86), rgba(0,0,0,0.94));
+  backdrop-filter: blur(18px);
+  box-shadow: 0 0 80px rgba(255,255,255,0.07);
+  opacity: 0;
+  transform: scale(0.96) translateY(16px);
+  pointer-events: none;
+  transition: opacity 260ms ease, transform 260ms ease;
+  overflow: hidden;
+}
+
+.playlist-panel.is-open {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  pointer-events: auto;
+}
+
+.playlist-panel::before {
+  content: "";
+  position: absolute;
+  inset: -25%;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,0.20) 0 1px, transparent 1.5px);
+  background-size: 34px 34px;
+  opacity: 0.045;
+  transform: rotate(-8deg);
+  pointer-events: none;
+}
+
+.playlist-header {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 22px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.10);
+  z-index: 1;
+}
+
+.playlist-title {
+  font-size: clamp(20px, 2.5vw, 30px);
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+}
+
+.playlist-count {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.close-btn {
+  font-size: 34px;
+  opacity: 0.68;
+}
+
+.close-btn:hover {
+  opacity: 1;
+  transform: scale(1.06);
+}
+
+.playlist-list {
+  position: relative;
+  z-index: 1;
+  height: calc(100% - 78px);
+  overflow: auto;
+  padding: 14px 2px 8px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.25) transparent;
+}
+
+.track-row {
+  display: grid;
+  grid-template-columns: 26px 42px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  min-height: 62px;
+  padding: 12px 8px;
+  color: rgba(255,255,255,0.72);
+  border: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.055);
+  background: transparent;
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 160ms ease, background 160ms ease, text-shadow 160ms ease;
+}
+
+.track-row:hover {
+  color: white;
+  background: rgba(255,255,255,0.035);
+  text-shadow: 0 0 22px rgba(255,255,255,0.18);
+}
+
+.track-row.is-active {
+  color: white;
+}
+
+.track-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.32);
+}
+
+.track-row.is-active .track-dot {
+  background: white;
+  box-shadow:
+    0 0 14px rgba(255,255,255,0.9),
+    0 0 34px rgba(255,255,255,0.45);
+}
+
+.track-index {
+  color: rgba(255,255,255,0.38);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.track-row-title {
+  font-size: 15px;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.track-row-meta {
+  margin-top: 4px;
+  color: rgba(255,255,255,0.40);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.track-row-duration {
+  color: rgba(255,255,255,0.36);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.empty-state {
+  color: rgba(255,255,255,0.50);
+  text-align: center;
+  padding: 80px 20px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+@media (max-width: 640px) {
+  body {
+    overflow: auto;
+  }
+
+  .app-shell {
+    min-height: 100svh;
+    padding: 18px;
+  }
+
+  .visual-stage {
+    width: 100%;
+    height: 45svh;
+    min-height: 270px;
+  }
+
+  .controls {
+    gap: 22px;
+  }
+
+  .progress-wrap {
+    grid-template-columns: 38px 1fr 38px;
+  }
+
+  .playlist-panel {
+    inset: auto 12px 12px;
+    height: 78svh;
+    border-radius: 26px;
+  }
+
+  .track-row {
+    grid-template-columns: 20px 34px 1fr;
+  }
+
+  .track-row-duration {
+    display: none;
+  }
+}
