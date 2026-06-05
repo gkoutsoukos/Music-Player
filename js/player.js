@@ -16,7 +16,6 @@
   const playlistCount = document.getElementById("playlistCount");
   const orbToggle = document.getElementById("orbToggle");
   const closePlaylist = document.getElementById("closePlaylist");
-  const playlistBtn = document.getElementById("playlistBtn");
 
   let tracks = [];
   let currentIndex = -1;
@@ -121,7 +120,7 @@
     playlistCount.textContent = `${tracks.length} ${tracks.length === 1 ? "track" : "tracks"}`;
 
     if (!tracks.length) {
-      playlistList.innerHTML = `<div class="empty-state">Load local audio files to build the playlist</div>`;
+      playlistList.innerHTML = `<button class="empty-state empty-load-btn" type="button">Load local audio files</button>`;
       return;
     }
 
@@ -408,6 +407,12 @@
   });
 
   playlistList.addEventListener("click", event => {
+    const emptyLoad = event.target.closest(".empty-load-btn");
+    if (emptyLoad) {
+      fileInput.click();
+      return;
+    }
+
     const row = event.target.closest(".track-row");
     if (!row) return;
     const index = Number(row.dataset.index);
@@ -421,10 +426,6 @@
 
   closePlaylist.addEventListener("click", () => {
     togglePlaylist(false);
-  });
-
-  playlistBtn.addEventListener("click", () => {
-    togglePlaylist(true);
   });
 
   window.addEventListener("keydown", event => {
