@@ -1,4 +1,4 @@
-# Particle Egg Music Player v3 — Control Overhaul
+# Orb Music Player v3 — Control Overhaul
 
 A GitHub-ready music player concept with:
 
@@ -29,7 +29,7 @@ Then open your GitHub Pages URL.
 
 - Click **Load tracks** and select local audio files.
 - Press **Play**.
-- Click/tap the particle egg to open the playlist.
+- Click/tap the Orb to open the playlist.
 - Select a track from the playlist.
 - Click × or press Escape to return to the main visualizer.
 
