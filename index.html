@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Orb Music Player</title>
+  <title>Particle Egg Music Player</title>
   <link rel="stylesheet" href="css/player.css" />
 </head>
 <body>
@@ -19,18 +19,18 @@
       <div id="trackMeta" class="track-meta">LOCAL FILES — PARTICLE PLAYER</div>
     </section>
 
-    <section class="transport-dock" aria-label="Playback controls">
-      <div class="transport-main">
-        <button id="prevBtn" class="control-btn side-btn" aria-label="Previous track">
-          <span aria-hidden="true"></span>
+    <section class="player-lower" aria-label="Playback controls">
+      <div class="transport-main compact-transport">
+        <button id="prevBtn" class="control-btn icon-btn prev-btn" aria-label="Previous track">
+          <span class="sr-only">Previous track</span>
         </button>
 
-        <button id="playBtn" class="control-btn play-btn" aria-label="Play or pause">
+        <button id="playBtn" class="control-btn icon-btn play-btn" aria-label="Play or pause">
           <span class="sr-only">Play or pause</span>
         </button>
 
-        <button id="nextBtn" class="control-btn side-btn next-side-btn" aria-label="Next track">
-          <span aria-hidden="true"></span>
+        <button id="nextBtn" class="control-btn icon-btn next-btn" aria-label="Next track">
+          <span class="sr-only">Next track</span>
         </button>
       </div>
 
@@ -40,13 +40,9 @@
         <span id="duration" class="time-label">0:00</span>
       </div>
 
-      <div class="dock-actions">
-        <button id="playlistBtn" class="dock-action-btn" type="button">Playlist</button>
-        <label class="dock-action-btn load-label">
-          Load
-          <input id="fileInput" type="file" accept="audio/*" multiple />
-        </label>
-      </div>
+      <label class="hidden-file-loader" aria-label="Load tracks">
+        <input id="fileInput" type="file" accept="audio/*" multiple />
+      </label>
     </section>
 
     <aside id="playlistPanel" class="playlist-panel" aria-hidden="true">
@@ -63,6 +59,13 @@
     <audio id="audio"></audio>
   </main>
 
+  <!-- Google Drive API configuration and helpers -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="https://apis.google.com/js/api.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/google-drive.js"></script>
+
+  <!-- Main player logic -->
   <script src="js/player.js"></script>
 </body>
 </html>
