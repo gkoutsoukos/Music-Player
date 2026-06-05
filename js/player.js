@@ -28,7 +28,7 @@
   let lastPulse = 0;
   let playlistOpen = false;
 
-  const PARTICLE_COUNT = 1550;
+  const PARTICLE_COUNT = 1850;
 
   function formatTime(seconds) {
     if (!Number.isFinite(seconds)) return "0:00";
@@ -177,54 +177,82 @@
     particles = [];
 
     for (let i = 0; i < PARTICLE_COUNT; i++) {
-      const band = Math.random();
-      const angle = Math.random() * Math.PI * 2;
+      const shellBias = Math.random();
+      const theta = Math.random() * Math.PI * 2;
+      const radialBand = shellBias < 0.76
+        ? 0.68 + Math.random() * 0.34
+        : Math.pow(Math.random(), 0.65) * 0.86;
 
-      // Egg geometry: slightly narrower top, heavier lower-right side.
-      const yBias = Math.sin(angle);
-      const eggFactor = 1 + 0.18 * Math.max(0, yBias) - 0.10 * Math.min(0, yBias);
-      const rx = scale * (0.255 + Math.random() * 0.035) * eggFactor;
-      const ry = scale * (0.330 + Math.random() * 0.045);
-
-      // More points near shell; some interior particles.
-      const r = band < 0.70
-        ? 0.78 + Math.random() * 0.25
-        : Math.pow(Math.random(), 0.55) * 0.88;
-
-      // Asymmetric density areas.
-      const clusterChoice = Math.random();
-      let clusterBoost = 0;
-      let clusterAngle = angle;
-
-      if (clusterChoice > 0.84) {
-        const clusters = [
-          { a: Math.PI * 0.92, s: 0.28 },  // left-mid dense area
-          { a: Math.PI * 1.62, s: 0.22 },  // lower-right bass weight
-          { a: Math.PI * 0.30, s: 0.18 }   // upper-right sparkle
-        ];
-        const c = clusters[Math.floor(Math.random() * clusters.length)];
-        clusterAngle = c.a + (Math.random() - 0.5) * c.s;
-        clusterBoost = Math.random() * 0.26;
-      }
-
-      const x = cx + Math.cos(clusterAngle) * rx * (r + clusterBoost);
-      const y = cy + Math.sin(clusterAngle) * ry * r + scale * 0.015;
+      const driftRadius = scale * (0.01 + Math.random() * 0.03);
+      const scatter = Math.random() < 0.12 ? 1 : 0;
 
       particles.push({
-        baseX: x,
-        baseY: y,
-        x,
-        y,
-        angle,
-        radius: r,
-        size: Math.random() < 0.025 ? 1.7 + Math.random() * 2.6 : 0.35 + Math.random() * 1.05,
+        theta,
+        radialBand,
+        x: cx + (Math.random() - 0.5) * scale * 0.08,
+        y: cy + (Math.random() - 0.5) * scale * 0.08,
+        vx: (Math.random() - 0.5) * 0.20,
+        vy: (Math.random() - 0.5) * 0.20,
+        size: Math.random() < 0.022 ? 1.6 + Math.random() * 2.8 : 0.35 + Math.random() * 1.05,
         alpha: 0.18 + Math.random() * 0.72,
-        speed: 0.002 + Math.random() * 0.010,
         phase: Math.random() * Math.PI * 2,
-        band: band < 0.18 ? "bass" : band < 0.62 ? "mid" : "high",
-        cluster: clusterChoice > 0.84
+        phase2: Math.random() * Math.PI * 2,
+        driftRadius,
+        band: shellBias < 0.18 ? "bass" : shellBias < 0.62 ? "mid" : "high",
+        shell: radialBand > 0.84,
+        scatter,
+        freedom: 0.6 + Math.random() * 1.4,
+        cohesion: 0.009 + Math.random() * 0.010
       });
     }
+  }
+
+  function blobRadius(theta, scale, t, bass, mid, high, volume) {
+    const phaseShift = t * (0.42 + bass * 0.55);
+    const lowWave =
+      Math.sin(theta * 2.0 + phaseShift) * (0.040 + bass * 0.095) +
+      Math.sin(theta * 3.0 - phaseShift * 0.8) * (0.024 + mid * 0.045);
+
+    const ripple =
+      Math.sin(theta * 5.0 + t * 0.72) * (0.014 + high * 0.030) +
+      Math.sin(theta * 7.0 - t * 0.58) * (0.010 + high * 0.018);
+
+    // Slight egg-memory when calm, becoming rounder and more fluid when active.
+    const eggMemory = 1 + 0.07 * Math.max(0, Math.sin(theta)) - 0.03 * Math.min(0, Math.sin(theta));
+    const roundness = 0.88 + volume * 0.20 + bass * 0.10;
+
+    return scale * 0.255 * eggMemory * roundness * (1 + lowWave + ripple);
+  }
+
+  function blobTarget(p, cx, cy, scale, t, bass, mid, high, volume) {
+    const fluidTwist =
+      Math.sin(t * 0.46 + p.phase) * 0.06 +
+      Math.sin(t * 0.21 + p.phase2) * (0.04 + bass * 0.06);
+
+    const theta = p.theta + fluidTwist;
+    const surfaceR = blobRadius(theta, scale, t, bass, mid, high, volume);
+
+    // Interior particles fill the volume, shell particles hug the changing skin.
+    const interiorPull = p.shell ? 1 : (0.18 + p.radialBand * 0.82);
+
+    const localBreath =
+      1 +
+      volume * 0.08 +
+      (p.band === "bass" ? bass : p.band === "mid" ? mid : high) * 0.10;
+
+    const radial = surfaceR * interiorPull * localBreath;
+
+    // Organic asymmetry that moves through the form rather than staying static.
+    const shearX = Math.sin(t * 0.38 + theta * 1.8 + p.phase) * scale * (0.006 + mid * 0.018);
+    const shearY = Math.cos(t * 0.33 + theta * 1.5 + p.phase2) * scale * (0.004 + bass * 0.016);
+
+    // Detached sparse particles breathe around the body.
+    const scatterAmount = p.scatter ? scale * (0.020 + volume * 0.060 + high * 0.035) : 0;
+
+    return {
+      x: cx + Math.cos(theta) * radial + shearX + Math.cos(p.phase + t * 0.9) * scatterAmount,
+      y: cy + Math.sin(theta) * radial * (1.08 + bass * 0.08) + shearY + Math.sin(p.phase2 + t * 0.8) * scatterAmount
+    };
   }
 
   function getBands() {
@@ -282,67 +310,88 @@
     lastPulse *= 0.94;
 
     ctx.clearRect(0, 0, w, h);
-
-    // Black fade layer keeps the void rich.
     ctx.fillStyle = "rgba(0,0,0,0.22)";
     ctx.fillRect(0, 0, w, h);
 
     const cx = w / 2;
     const cy = h / 2;
+    const scale = Math.min(w, h);
+    const playlistFactor = playlistOpen ? 0.36 : 1;
 
-    // Subtle ghost glow.
-    const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(w, h) * 0.46);
-    glow.addColorStop(0, `rgba(255,255,255,${0.020 + volume * 0.07 + lastPulse * 0.03})`);
-    glow.addColorStop(0.35, `rgba(255,255,255,${0.013 + mid * 0.035})`);
+    // Core liquid glow.
+    const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, scale * 0.48);
+    glow.addColorStop(0, `rgba(255,255,255,${0.030 + volume * 0.11 + bass * 0.07 + lastPulse * 0.03})`);
+    glow.addColorStop(0.26, `rgba(255,255,255,${0.020 + mid * 0.06})`);
+    glow.addColorStop(0.54, `rgba(255,255,255,${0.010 + high * 0.03})`);
     glow.addColorStop(1, "rgba(255,255,255,0)");
     ctx.fillStyle = glow;
     ctx.fillRect(0, 0, w, h);
 
-    const playlistFactor = playlistOpen ? 0.42 : 1;
-
     for (const p of particles) {
       const bandEnergy = p.band === "bass" ? bass : p.band === "mid" ? mid : high;
-      const breathe = 1 + volume * 0.055 + bandEnergy * 0.105 + lastPulse * 0.10;
+      const target = blobTarget(p, cx, cy, scale, t, bass, mid, high, volume);
 
-      const driftX = Math.cos(t * 0.75 + p.phase) * (2.2 + bandEnergy * 8);
-      const driftY = Math.sin(t * 0.65 + p.phase * 1.13) * (1.7 + bandEnergy * 6);
+      const dx = target.x - p.x;
+      const dy = target.y - p.y;
 
-      // When playlist is open, particles loosen and dim behind the list.
-      const openSpread = playlistOpen ? 1.06 : 1;
-      p.x = cx + (p.baseX - cx) * breathe * openSpread + driftX;
-      p.y = cy + (p.baseY - cy) * breathe * openSpread + driftY;
+      const curlX =
+        Math.cos(t * (0.70 + bandEnergy * 0.30) + p.phase + p.y * 0.007) *
+        (0.05 + bandEnergy * 0.20) * p.freedom;
+      const curlY =
+        Math.sin(t * (0.64 + bandEnergy * 0.26) + p.phase2 + p.x * 0.006) *
+        (0.05 + bandEnergy * 0.18) * p.freedom;
 
-      const activeAlpha = (p.alpha * (0.40 + bandEnergy * 1.55 + (p.cluster ? 0.26 : 0))) * playlistFactor;
-      const size = p.size * (1 + bandEnergy * 1.9 + (p.cluster ? bass * 0.7 : 0));
+      const swirlStrength = (0.0016 + volume * 0.012 + mid * 0.010) * p.freedom;
+      const swirlX = -dy * swirlStrength;
+      const swirlY = dx * swirlStrength;
+
+      const spring = p.cohesion * (playlistOpen ? 0.62 : 1.0);
+      p.vx += dx * spring + curlX + swirlX;
+      p.vy += dy * spring + curlY + swirlY;
+
+      const damping = playlistOpen ? 0.90 : 0.935;
+      p.vx *= damping;
+      p.vy *= damping;
+
+      p.x += p.vx;
+      p.y += p.vy;
+
+      const activeAlpha =
+        (p.alpha * (0.36 + bandEnergy * 1.55 + (p.shell ? 0.10 : 0) + (p.scatter ? 0.08 : 0))) *
+        playlistFactor;
+      const size =
+        p.size *
+        (1 + volume * 0.18 + bandEnergy * 1.65 + (p.shell ? high * 0.35 : bass * 0.22));
 
       ctx.beginPath();
-      ctx.fillStyle = `rgba(255,255,255,${Math.min(0.96, activeAlpha)})`;
+      ctx.fillStyle = `rgba(255,255,255,${Math.min(0.95, activeAlpha)})`;
       ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
       ctx.fill();
 
-      // Bright clustered points get a soft halo.
-      if (p.cluster && (bass + mid + high) > 0.22) {
+      if (p.shell && (bass + mid + high) > 0.16) {
         ctx.beginPath();
-        ctx.fillStyle = `rgba(255,255,255,${Math.min(0.16, bandEnergy * 0.22)})`;
-        ctx.arc(p.x, p.y, size * 3.8, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${Math.min(0.12, 0.03 + bandEnergy * 0.10)})`;
+        ctx.arc(p.x, p.y, size * 3.0, 0, Math.PI * 2);
         ctx.fill();
       }
     }
 
-    // Irregular shell highlights: enough to define the egg, not a perfect wireframe.
+    // Dynamic contour strokes so the form reads as a changing liquid body.
     ctx.save();
-    ctx.globalAlpha = (0.20 + bass * 0.42 + lastPulse * 0.22) * playlistFactor;
-    ctx.strokeStyle = "rgba(255,255,255,0.86)";
+    ctx.globalAlpha = (0.11 + bass * 0.18 + mid * 0.12 + lastPulse * 0.08) * playlistFactor;
+    ctx.strokeStyle = "rgba(255,255,255,0.92)";
     ctx.lineWidth = 0.75;
-    for (let k = 0; k < 5; k++) {
+
+    for (let ring = 0; ring < 3; ring++) {
+      const ringScale = 1 - ring * 0.055;
       ctx.beginPath();
       for (let i = 0; i <= 180; i++) {
         const a = (i / 180) * Math.PI * 2;
-        const wobble = Math.sin(a * 5 + t * (0.7 + k * 0.08) + k) * 7;
-        const rx = Math.min(w, h) * (0.245 + k * 0.004);
-        const ry = Math.min(w, h) * (0.315 + k * 0.003);
-        const x = cx + Math.cos(a) * (rx + wobble) * (1 + 0.10 * Math.max(0, Math.sin(a)));
-        const y = cy + Math.sin(a) * (ry + wobble * 0.5) + Math.min(w,h) * 0.015;
+        const r =
+          blobRadius(a, scale * ringScale, t + ring * 0.2, bass, mid, high, volume) *
+          (1 - ring * 0.06);
+        const x = cx + Math.cos(a) * r;
+        const y = cy + Math.sin(a) * r * (1.07 + bass * 0.06);
         if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
       }
       ctx.stroke();
@@ -383,11 +432,11 @@
   prevBtn.addEventListener("click", prevTrack);
 
   audio.addEventListener("play", () => {
-    playBtn.textContent = "❚❚";
+    playBtn.classList.add("is-playing");
   });
 
   audio.addEventListener("pause", () => {
-    playBtn.textContent = "▶";
+    playBtn.classList.remove("is-playing");
   });
 
   audio.addEventListener("ended", nextTrack);
