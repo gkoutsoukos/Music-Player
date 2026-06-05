@@ -39,7 +39,7 @@ body {
   position: relative;
   min-height: 100vh;
   display: grid;
-  grid-template-rows: 1fr auto auto;
+  grid-template-rows: minmax(330px, 1fr) auto auto;
   justify-items: center;
   align-items: center;
   padding: clamp(20px, 3vw, 44px);
@@ -51,8 +51,8 @@ body {
 
 .visual-stage {
   width: min(86vw, 980px);
-  height: min(52vh, 540px);
-  min-height: 310px;
+  height: min(50vh, 500px);
+  min-height: 300px;
   display: grid;
   place-items: center;
   margin-top: 2vh;
@@ -85,13 +85,13 @@ body {
   width: min(90vw, 780px);
   text-align: center;
   pointer-events: none;
-  transform: translateY(-10px);
+  transform: translateY(-4px);
 }
 
 .track-title {
-  font-size: clamp(22px, 3vw, 38px);
+  font-size: clamp(21px, 2.8vw, 34px);
   font-weight: 520;
-  letter-spacing: 0.055em;
+  letter-spacing: 0.060em;
   line-height: 1.08;
   text-transform: uppercase;
   text-wrap: balance;
@@ -99,7 +99,7 @@ body {
 }
 
 .track-meta {
-  margin-top: 10px;
+  margin-top: 9px;
   color: var(--muted);
   font-size: clamp(11px, 1.35vw, 14px);
   font-weight: 420;
@@ -108,22 +108,29 @@ body {
 }
 
 
-/* Transport dock: pure white icon-only controls */
+/* Poster layout lower player:
+   [visualizer]
+   SONG TITLE
+   Artist — Album
+   previous / play / next
+   progress
+*/
 
-.transport-dock {
-  width: min(88vw, 620px);
+.player-lower {
+  width: min(90vw, 620px);
   display: grid;
-  gap: 12px;
   justify-items: center;
-  margin-top: 14px;
+  gap: 10px;
+  margin-top: 18px;
 }
 
-.transport-main {
+.compact-transport {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(36px, 6vw, 70px);
-  height: 58px;
+  gap: clamp(42px, 7vw, 76px);
+  height: 40px;
+  margin-top: 0;
 }
 
 .control-btn {
@@ -137,89 +144,70 @@ body {
   font-family: inherit;
   -webkit-tap-highlight-color: transparent;
   transition:
-    transform 170ms ease,
-    opacity 170ms ease,
-    filter 170ms ease;
+    transform 150ms ease,
+    opacity 150ms ease,
+    filter 150ms ease;
 }
 
 .icon-btn {
-  width: 48px;
-  height: 48px;
-  opacity: 0.84;
+  width: 36px;
+  height: 36px;
+  opacity: 0.82;
   border-radius: 50%;
 }
 
 .icon-btn:hover {
   opacity: 1;
   filter:
-    drop-shadow(0 0 9px rgba(255,255,255,0.64))
-    drop-shadow(0 0 24px rgba(255,255,255,0.20));
+    drop-shadow(0 0 8px rgba(255,255,255,0.62))
+    drop-shadow(0 0 20px rgba(255,255,255,0.20));
 }
 
 .icon-btn:active {
-  transform: scale(0.92);
+  transform: scale(0.90);
 }
 
-/* Previous / next: line + triangle in pure white */
+/* Previous / next: delicate single-chevron style, closer to ◁ / ▷ */
 .prev-btn::before,
 .next-btn::before {
   content: "";
   position: absolute;
-  width: 3px;
-  height: 20px;
-  background: rgba(255,255,255,0.92);
-  border-radius: 2px;
-  box-shadow: 0 0 10px rgba(255,255,255,0.34);
+  width: 13px;
+  height: 13px;
+  border-top: 2px solid rgba(255,255,255,0.88);
+  border-left: 2px solid rgba(255,255,255,0.88);
+  filter: drop-shadow(0 0 7px rgba(255,255,255,0.34));
 }
 
 .prev-btn::before {
-  left: 12px;
+  transform: rotate(-45deg) translateX(2px);
 }
 
 .next-btn::before {
-  right: 12px;
+  transform: rotate(135deg) translateX(2px);
 }
 
-.prev-btn::after,
-.next-btn::after {
-  content: "";
-  position: absolute;
-  width: 0;
-  height: 0;
-  filter: drop-shadow(0 0 8px rgba(255,255,255,0.38));
+/* Play / pause: clean central transport icon, no enclosing circle */
+.play-btn {
+  opacity: 0.92;
 }
 
-.prev-btn::after {
-  border-top: 11px solid transparent;
-  border-bottom: 11px solid transparent;
-  border-right: 18px solid rgba(255,255,255,0.92);
-  transform: translateX(4px);
-}
-
-.next-btn::after {
-  border-top: 11px solid transparent;
-  border-bottom: 11px solid transparent;
-  border-left: 18px solid rgba(255,255,255,0.92);
-  transform: translateX(-4px);
-}
-
-/* Play / pause: clean white transport icon, no enclosing circle */
 .play-btn::before {
   content: "";
   width: 0;
   height: 0;
-  border-top: 13px solid transparent;
-  border-bottom: 13px solid transparent;
-  border-left: 21px solid rgba(255,255,255,0.96);
-  transform: translateX(2.5px);
+  border-top: 11px solid transparent;
+  border-bottom: 11px solid transparent;
+  border-left: 17px solid rgba(255,255,255,0.96);
+  transform: translateX(2px);
   filter: drop-shadow(0 0 9px rgba(255,255,255,0.45));
 }
 
 .play-btn.is-playing::before,
 .play-btn.is-playing::after {
   content: "";
-  width: 6px;
-  height: 25px;
+  width: 5px;
+  height: 22px;
   border: 0;
   background: rgba(255,255,255,0.96);
   border-radius: 2px;
@@ -227,26 +215,26 @@ body {
 }
 
 .play-btn.is-playing::before {
-  transform: translateX(-6px);
+  transform: translateX(-5px);
 }
 
 .play-btn.is-playing::after {
   position: absolute;
-  transform: translateX(6px);
+  transform: translateX(5px);
 }
 
 .progress-wrap {
-  width: min(86vw, 570px);
+  width: min(86vw, 540px);
   display: grid;
   grid-template-columns: 42px 1fr 42px;
   align-items: center;
   gap: 12px;
   padding: 0 2px;
-  margin-top: 2px;
+  margin-top: 0;
 }
 
 .time-label {
-  color: rgba(255,255,255,0.48);
+  color: rgba(255,255,255,0.46);
   font-size: 11px;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.035em;
@@ -271,11 +259,11 @@ body {
   border-radius: 999px;
   background:
     linear-gradient(90deg,
-      rgba(255,255,255,0.88) 0%,
-      rgba(255,255,255,0.88) var(--progress-fill),
-      rgba(255,255,255,0.16) var(--progress-fill),
-      rgba(255,255,255,0.16) 100%);
-  box-shadow: 0 0 10px rgba(255,255,255,0.10);
+      rgba(255,255,255,0.90) 0%,
+      rgba(255,255,255,0.90) var(--progress-fill),
+      rgba(255,255,255,0.15) var(--progress-fill),
+      rgba(255,255,255,0.15) 100%);
+  box-shadow: 0 0 10px rgba(255,255,255,0.09);
 }
 
 .progress::-moz-range-track {
@@ -283,34 +271,34 @@ body {
   border-radius: 999px;
   background:
     linear-gradient(90deg,
-      rgba(255,255,255,0.88) 0%,
-      rgba(255,255,255,0.88) var(--progress-fill),
-      rgba(255,255,255,0.16) var(--progress-fill),
-      rgba(255,255,255,0.16) 100%);
-  box-shadow: 0 0 10px rgba(255,255,255,0.10);
+      rgba(255,255,255,0.90) 0%,
+      rgba(255,255,255,0.90) var(--progress-fill),
+      rgba(255,255,255,0.15) var(--progress-fill),
+      rgba(255,255,255,0.15) 100%);
+  box-shadow: 0 0 10px rgba(255,255,255,0.09);
 }
 
 .progress::-webkit-slider-thumb {
   appearance: none;
-  width: 10px;
-  height: 10px;
-  margin-top: -4.5px;
+  width: 9px;
+  height: 9px;
+  margin-top: -4px;
   border-radius: 50%;
   background: white;
   box-shadow:
-    0 0 14px rgba(255,255,255,0.92),
-    0 0 34px rgba(255,255,255,0.32);
+    0 0 13px rgba(255,255,255,0.92),
+    0 0 30px rgba(255,255,255,0.30);
 }
 
 .progress::-moz-range-thumb {
-  width: 10px;
-  height: 10px;
+  width: 9px;
+  height: 9px;
   border: 0;
   border-radius: 50%;
   background: white;
   box-shadow:
-    0 0 14px rgba(255,255,255,0.92),
-    0 0 34px rgba(255,255,255,0.32);
+    0 0 13px rgba(255,255,255,0.92),
+    0 0 30px rgba(255,255,255,0.30);
 }
 
 .hidden-file-loader {
@@ -504,19 +492,19 @@ body {
     min-height: 270px;
   }
 
-  .transport-dock {
+  .player-lower {
     width: 94vw;
-    gap: 10px;
+    gap: 9px;
   }
 
-  .transport-main {
-    gap: 34px;
-    height: 54px;
+  .compact-transport {
+    gap: 36px;
+    height: 40px;
   }
 
   .icon-btn {
-    width: 44px;
-    height: 44px;
+    width: 38px;
+    height: 38px;
   }
 
   .progress-wrap {
@@ -537,4 +525,34 @@ body {
   .track-row-duration {
     display: none;
   }
+}
+
+
+/* v9 empty playlist load options */
+.empty-state-stack {
+  display: grid;
+  gap: 14px;
+  place-items: center;
+}
+
+.empty-load-btn,
+.empty-drive-btn {
+  min-width: 230px;
+  height: 42px;
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 999px;
+  background: rgba(255,255,255,0.018);
+  color: rgba(255,255,255,0.74);
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.empty-load-btn:hover,
+.empty-drive-btn:hover {
+  color: white;
+  border-color: rgba(255,255,255,0.28);
+  box-shadow: 0 0 24px rgba(255,255,255,0.06);
 }
